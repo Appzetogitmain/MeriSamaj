@@ -25,21 +25,41 @@ exports.createSubLeader = async (req, res) => {
     }
 
     if (isAppUser !== false) {
-      // ── TYPE 1: App Leader (User account with login credentials) ──
-      if (!phone || !password) {
-        return res.status(400).json({ status: 'error', message: 'Phone and password are required for App Leaders' });
+      // ── TYPE 1: App Leader / Local Head (User account with login credentials) ──
+      if (!password) {
+        return res.status(400).json({ status: 'error', message: 'Password is required for Local Head login credentials' });
       }
 
-      // Check duplicate phone/email
-      const existingPhone = await User.findOne({ phone });
-      if (existingPhone) {
-        return res.status(400).json({ status: 'error', message: 'Phone number already registered' });
+      if (!phone && !email) {
+        return res.status(400).json({ status: 'error', message: 'Either Email address or Phone number is required to set up login' });
       }
 
-      if (email) {
-        const existingEmail = await User.findOne({ email });
+      // Handle phone requirement: if phone is provided use it; if omitted, generate a unique system phone number
+      const effectivePhone = phone ? phone.trim() : `900${Date.now().toString().slice(-7)}`;
+      const effectiveEmail = email ? email.trim().toLowerCase() : undefined;
+      const effectiveLoginId = effectiveEmail || undefined;
+
+      // Check duplicate phone
+      if (phone) {
+        const existingPhone = await User.findOne({ phone: effectivePhone });
+        if (existingPhone) {
+          return res.status(400).json({ status: 'error', message: 'Phone number already registered to another user' });
+        }
+      }
+
+      // Check duplicate email
+      if (effectiveEmail) {
+        const existingEmail = await User.findOne({ email: effectiveEmail });
         if (existingEmail) {
-          return res.status(400).json({ status: 'error', message: 'Email address already registered' });
+          return res.status(400).json({ status: 'error', message: 'Email address already registered to another user' });
+        }
+      }
+
+      // Check duplicate loginId
+      if (effectiveLoginId) {
+        const existingLoginId = await User.findOne({ loginId: effectiveLoginId });
+        if (existingLoginId) {
+          return res.status(400).json({ status: 'error', message: 'Email / Login ID is already in use' });
         }
       }
 
@@ -64,13 +84,13 @@ exports.createSubLeader = async (req, res) => {
       }
 
       const resolvedCity = city || req.user?.city || (req.user?.workAddress ? req.user.workAddress.split(',').pop().trim() : 'Indore');
-      const hashedPassword = await bcrypt.hash(password, 10);
 
       const subLeader = new User({
         name,
-        email: email || undefined,
-        phone,
-        password: hashedPassword,
+        email: effectiveEmail,
+        loginId: effectiveLoginId,
+        phone: effectivePhone,
+        password: password,
         plainPassword: undefined,
         role: 'sub_head',
         parentHeadId: req.user._id,
@@ -78,7 +98,7 @@ exports.createSubLeader = async (req, res) => {
         assignedCommunityIds: req.user?.assignedCommunityIds || [payload.communityId],
         city: resolvedCity,
         state: state || req.user?.state || 'Madhya Pradesh',
-        designation: designation || 'Executive Member',
+        designation: designation || 'Local Head',
         department: department || 'General Governance',
         termYears: termYears || '2024-2027',
         joiningDate: new Date(),
@@ -91,13 +111,15 @@ exports.createSubLeader = async (req, res) => {
 
       return res.status(201).json({
         status: 'success',
-        message: 'Sub-leader created successfully with secure credentials.',
+        message: 'Local Head created successfully with login credentials.',
         data: {
           id: subLeader._id,
           name: subLeader.name,
           email: subLeader.email,
           phone: subLeader.phone,
+          loginId: subLeader.loginId,
           designation: subLeader.designation,
+          city: subLeader.city,
           permissions: subLeader.headPermissions,
           isAppUser: true
         }

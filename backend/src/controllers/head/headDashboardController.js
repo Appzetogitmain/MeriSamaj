@@ -346,3 +346,65 @@ exports.updateCommunityBanner = async (req, res) => {
     res.status(500).json({ status: 'error', message: 'Failed to update community banner' });
   }
 };
+
+/**
+ * @desc    Get community details (Scoped to Head's community)
+ * @route   GET /api/v1/head/dashboard/community/details
+ * @access  Private (Head/Admin/Sub-head)
+ */
+exports.getCommunityDetails = async (req, res) => {
+  try {
+    const Community = require('../../models/Community');
+    if (!req.communityId) {
+      return res.status(400).json({ status: 'fail', message: 'No community context found for this Head user.' });
+    }
+    const community = await Community.findById(req.communityId).lean();
+    if (!community) {
+      return res.status(404).json({ status: 'fail', message: 'Community not found.' });
+    }
+    res.status(200).json({
+      status: 'success',
+      data: community
+    });
+  } catch (error) {
+    console.error('Get Community Details Error:', error);
+    res.status(500).json({ status: 'error', message: 'Failed to retrieve community details' });
+  }
+};
+
+/**
+ * @desc    Update community account details (Scoped to Head's community)
+ * @route   PUT /api/v1/head/dashboard/community/account-details
+ * @access  Private (Head/Admin)
+ */
+exports.updateCommunityAccountDetails = async (req, res) => {
+  try {
+    const Community = require('../../models/Community');
+    const { accountDetails } = req.body;
+
+    if (!req.communityId) {
+      return res.status(400).json({ status: 'fail', message: 'No community context found for this Head user.' });
+    }
+
+    const updatedCommunity = await Community.findByIdAndUpdate(
+      req.communityId,
+      { $set: { accountDetails: accountDetails || {} } },
+      { new: true }
+    );
+
+    if (!updatedCommunity) {
+      return res.status(404).json({ status: 'fail', message: 'Community not found.' });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Community account details updated successfully',
+      data: {
+        accountDetails: updatedCommunity.accountDetails
+      }
+    });
+  } catch (error) {
+    console.error('Update Community Account Details Error:', error);
+    res.status(500).json({ status: 'error', message: 'Failed to update community account details' });
+  }
+};

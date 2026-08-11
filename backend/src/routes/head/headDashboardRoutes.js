@@ -16,4 +16,10 @@ router.patch('/members/:id/revoke', authorize('head', 'admin', 'super_admin', 'm
 // Community Banner Update — Scoped to req.communityId
 router.put('/community/banner', authorize('head', 'sub_head', 'admin', 'super_admin', 'master_admin'), headDashboardCtrl.updateCommunityBanner);
 
+// GET /api/v1/head/dashboard/community/details — View community details
+router.get('/community/details', authorize('head', 'sub_head', 'admin', 'super_admin', 'master_admin'), headDashboardCtrl.getCommunityDetails);
+
+// PUT /api/v1/head/dashboard/community/account-details — Update community account details
+router.put('/community/account-details', authorize('head', 'admin', 'super_admin', 'master_admin'), headDashboardCtrl.updateCommunityAccountDetails);
+
 module.exports = router;

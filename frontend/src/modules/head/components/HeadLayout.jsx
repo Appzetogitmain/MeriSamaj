@@ -146,6 +146,12 @@ export const HeadLayout = () => {
           path: '/head/leadership',
           permKey: 'canViewLeadership',
           icon: Shield
+        },
+        {
+          name: 'Local Heads',
+          path: '/head/local-heads',
+          permKey: 'canViewLeadership',
+          icon: ShieldCheck
         }
       ]
     },
@@ -163,6 +169,11 @@ export const HeadLayout = () => {
           path: '/head/home-content',
           permKey: 'canViewHomeContent',
           icon: LayoutTemplate
+        },
+        {
+          name: 'Community Settings',
+          path: '/head/settings',
+          icon: Settings
         }
       ]
     }

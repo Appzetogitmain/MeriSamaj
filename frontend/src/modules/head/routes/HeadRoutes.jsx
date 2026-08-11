@@ -23,9 +23,11 @@ import SocialCityFeed from '../pages/social/SocialCityFeed';
 import SocialCommunityFeed from '../pages/social/SocialCommunityFeed';
 import { HeadGroupsPage } from '../pages/groups/HeadGroupsPage';
 import HeadLeadershipManagement from '../pages/leadership/HeadLeadershipManagement';
+import HeadLocalHeadManagement from '../pages/leadership/HeadLocalHeadManagement';
 import { HeadCensusManagement } from '../pages/census/HeadCensusManagement';
 import { HeadNotificationCenter } from '../pages/notifications/HeadNotificationCenter';
 import HeadProfileSettings from '../pages/profile/HeadProfileSettings';
+import CommunitySettings from '../pages/settings/CommunitySettings';
 
 export const HeadRoutes = () => {
   return (
@@ -75,6 +77,8 @@ export const HeadRoutes = () => {
           <Route path="home-content" element={<HomepageContentManager />} />
           <Route path="engagement" element={<CommunityEngagement />} />
           <Route path="leadership" element={<HeadLeadershipManagement />} />
+          <Route path="local-heads" element={<HeadLocalHeadManagement />} />
+          <Route path="settings" element={<CommunitySettings />} />
 
           {/* Catch-all */}
           <Route path="*" element={<Navigate to="/head/dashboard" replace />} />

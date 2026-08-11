@@ -65,7 +65,7 @@ exports.getActiveDonations = async (req, res) => {
 exports.getDonationById = async (req, res) => {
   try {
     const filter = applyScopeFilter(req, { _id: req.params.id, isDeleted: false });
-    const donation = await Donation.findOne(filter).lean();
+    const donation = await Donation.findOne(filter).populate('communityId').lean();
 
     if (!donation) {
       return res.status(404).json({ success: false, message: 'Donation campaign not found or access denied' });
