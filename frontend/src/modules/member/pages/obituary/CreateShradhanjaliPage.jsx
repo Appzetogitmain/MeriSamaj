@@ -22,12 +22,7 @@ import { AnimatedPage } from '../../components/layout/AnimatedPage';
 import StepWizard from './components/StepWizard';
 
 const CEREMONY_TYPES = [
-  'Uthawna / Chautha',
-  'Pagri Rasam',
-  'Besna',
-  'Terahvi',
-  'Funeral / Last Rites',
-  'Shradh'
+  'Funeral / Last Rites'
 ];
 
 const PREFIXES = ['Late', 'Late Shri', 'Late Smt', 'Shri', 'Smt', ''];
@@ -43,12 +38,12 @@ const INITIAL_FORM = {
   birthDate: '',
   dateOfPassing: '',
   // Step 3 — Ceremony
-  ritesType: 'Uthawna / Chautha',
+  ritesType: 'Funeral / Last Rites',
   ritesDate: '',
   ritesTime: '',
   ritesVenue: '',
   ceremonies: [
-    { type: 'Uthawna / Chautha', date: '', time: '', venue: '' }
+    { type: 'Funeral / Last Rites', date: '', time: '', venue: '' }
   ],
   showLocation: true,
   // Step 4 — Description & Privacy
@@ -471,7 +466,7 @@ const CreateShradhanjaliPage = () => {
     if (isEditMode && obituaryToEdit) {
       const existingCeremonies = (obituaryToEdit.ceremonies && obituaryToEdit.ceremonies.length > 0)
         ? obituaryToEdit.ceremonies
-        : (obituaryToEdit.funeralDetails ? [obituaryToEdit.funeralDetails] : [{ type: 'Uthawna / Chautha', date: '', time: '', venue: '' }]);
+        : (obituaryToEdit.funeralDetails ? [obituaryToEdit.funeralDetails] : [{ type: 'Funeral / Last Rites', date: '', time: '', venue: '' }]);
 
       setForm({
         photoUrl: obituaryToEdit.image || '',
@@ -481,7 +476,7 @@ const CreateShradhanjaliPage = () => {
         age: obituaryToEdit.age?.toString() || '',
         birthDate: obituaryToEdit.birthDate || '',
         dateOfPassing: obituaryToEdit.dateOfPassing || '',
-        ritesType: existingCeremonies[0]?.type || 'Uthawna / Chautha',
+        ritesType: existingCeremonies[0]?.type || 'Funeral / Last Rites',
         ritesDate: existingCeremonies[0]?.date || '',
         ritesTime: existingCeremonies[0]?.time || '',
         ritesVenue: existingCeremonies[0]?.venue || '',
@@ -903,7 +898,7 @@ const CreateShradhanjaliPage = () => {
             onClick={() => {
               const updated = [
                 ...(form.ceremonies || []),
-                { type: 'Tehravi / Prayers', date: '', time: '', venue: '' }
+                { type: 'Funeral / Last Rites', date: '', time: '', venue: '' }
               ];
               setForm(f => ({ ...f, ceremonies: updated }));
             }}
@@ -933,75 +928,72 @@ const CreateShradhanjaliPage = () => {
                   animate={{ y: 0 }}
                   exit={{ y: '100%' }}
                   transition={{ type: 'spring', stiffness: 380, damping: 36 }}
-                  className="w-full max-w-md rounded-t-[28px] overflow-hidden"
-                  style={{ background: 'white', touchAction: 'auto' }}
+                  className="w-full max-w-md rounded-t-[28px] overflow-hidden bg-white shadow-2xl pb-6"
                   onClick={e => e.stopPropagation()}
                 >
-                {/* Handle */}
-                <div className="flex justify-center pt-3 pb-1">
-                  <div className="w-10 h-1 rounded-full bg-slate-200" />
-                </div>
+                  {/* Handle */}
+                  <div className="flex justify-center pt-3 pb-1">
+                    <div className="w-12 h-1.5 rounded-full bg-slate-200" />
+                  </div>
 
-                {/* Title */}
-                <div
-                  className="flex items-center justify-between px-5 py-3 border-b"
-                  style={{ borderColor: 'rgba(212,175,55,0.15)' }}
-                >
-                  <h3 className="text-[15px] font-extrabold" style={{ color: '#7C5C2E' }}>Select Ceremony Type</h3>
-                  <button
-                    onClick={() => setShowCeremonyPicker(null)}
-                    className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center press-scale"
+                  {/* Title */}
+                  <div
+                    className="flex items-center justify-between px-5 py-3 border-b"
+                    style={{ borderColor: 'rgba(212,175,55,0.15)' }}
                   >
-                    <X size={13} className="text-slate-500" />
-                  </button>
-                </div>
+                    <h3 className="text-[15px] font-extrabold" style={{ color: '#7C5C2E' }}>Select Ceremony Type</h3>
+                    <button
+                      type="button"
+                      onClick={() => setShowCeremonyPicker(null)}
+                      className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center press-scale hover:bg-slate-200 transition-colors"
+                    >
+                      <X size={14} className="text-slate-500" />
+                    </button>
+                  </div>
 
-                {/* Options list */}
-                <div className="py-2 pb-8">
-                  {CEREMONY_TYPES.map((type, idx) => {
-                    const activeIndex = typeof showCeremonyPicker === 'number' ? showCeremonyPicker : 0;
-                    const isSelected = form.ceremonies?.[activeIndex]?.type === type;
-                    return (
-                      <motion.button
-                        key={type}
-                        type="button"
-                        initial={{ opacity: 0, x: -8 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.04 }}
-                        onClick={() => {
-                          const updated = [...(form.ceremonies || [])];
-                          if (updated[activeIndex]) {
-                            updated[activeIndex] = { ...updated[activeIndex], type };
-                          }
-                          setForm(f => ({ ...f, ceremonies: updated, ritesType: updated[0]?.type || type }));
-                          setShowCeremonyPicker(null);
-                        }}
-                        className="w-full flex items-center justify-between px-5 py-3.5 text-left transition-colors press-scale"
-                        style={{
-                          background: isSelected ? 'rgba(212,175,55,0.08)' : 'transparent',
-                          borderBottom: idx < CEREMONY_TYPES.length - 1 ? '1px solid rgba(0,0,0,0.04)' : 'none'
-                        }}
-                      >
-                        <span
-                          className="text-[13.5px] font-extrabold"
-                          style={{ color: isSelected ? '#7C5C2E' : '#1A1A1A' }}
+                  {/* Options list */}
+                  <div className="p-4 space-y-2">
+                    {CEREMONY_TYPES.map((type, idx) => {
+                      const activeIndex = typeof showCeremonyPicker === 'number' ? showCeremonyPicker : 0;
+                      const isSelected = form.ceremonies?.[activeIndex]?.type === type;
+                      return (
+                        <motion.button
+                          key={type}
+                          type="button"
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: idx * 0.04 }}
+                          onClick={() => {
+                            const updated = [...(form.ceremonies || [])];
+                            if (updated[activeIndex]) {
+                              updated[activeIndex] = { ...updated[activeIndex], type };
+                            }
+                            setForm(f => ({ ...f, ceremonies: updated, ritesType: updated[0]?.type || type }));
+                            setShowCeremonyPicker(null);
+                          }}
+                          className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl border text-left transition-all press-scale ${
+                            isSelected
+                              ? 'bg-amber-50/90 border-amber-300/80 text-[#7C5C2E] shadow-sm'
+                              : 'bg-slate-50/60 border-slate-200/60 text-slate-700 hover:bg-slate-100/60'
+                          }`}
                         >
-                          {type}
-                        </span>
-                        {isSelected && (
-                          <motion.span
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="text-[16px]"
-                          >
-                            ✓
-                          </motion.span>
-                        )}
-                      </motion.button>
-                    );
-                  })}
-                </div>
-              </motion.div>
+                          <span className="text-[13.5px] font-bold">
+                            {type}
+                          </span>
+                          {isSelected && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                            >
+                              <CheckCircle2 size={18} className="text-[#7C5C2E] shrink-0" />
+                            </motion.div>
+                          )}
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
             </motion.div>
             )}
           </AnimatePresence>,
