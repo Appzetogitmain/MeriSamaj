@@ -45,11 +45,22 @@ connectDB();
 initEventReminderRunner();
 
 // Global Middlewares
-// CORS must be first so preflight and rate-limited requests get headers!
+const allowedOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(',').map(url => url.trim())
+  : [];
+
 app.use(cors({
-  origin: process.env.CLIENT_URL 
-    ? process.env.CLIENT_URL.split(',') 
-    : true,
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (
+      allowedOrigins.includes(origin) ||
+      process.env.NODE_ENV === 'development' ||
+      /^http:\/\/localhost:\d+$/.test(origin)
+    ) {
+      return callback(null, true);
+    }
+    return callback(new Error('CORS Policy Violation'), false);
+  },
   credentials: true
 }));
 

@@ -56,6 +56,9 @@ setInterval(() => {
  * Login Rate Limiter: 5 attempts per IP per 15 minutes
  */
 const loginLimiter = (req, res, next) => {
+  if (process.env.NODE_ENV === 'development') {
+    return next();
+  }
   const ip = req.ip || req.connection?.remoteAddress || 'unknown';
   const key = getKey('login', ip);
   const maxAttempts = 5;

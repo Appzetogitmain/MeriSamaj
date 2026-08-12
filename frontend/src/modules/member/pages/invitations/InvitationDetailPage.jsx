@@ -11,6 +11,7 @@ export default function InvitationDetailPage() {
   
   const inv = invitations.find(i => String(i.id || i._id) === String(id));
   const [currentImgIndex, setCurrentImgIndex] = useState(0);
+  const [fullscreenImg, setFullscreenImg] = useState(null);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [creatorRsvpTab, setCreatorRsvpTab] = useState('attending');
   const [selectedStatus, setSelectedStatus] = useState(null);
@@ -416,24 +417,40 @@ export default function InvitationDetailPage() {
         <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100">
           <div className="relative overflow-hidden flex flex-col items-center justify-center text-center">
             {images.length > 0 ? (
-              <div className="relative w-full h-72 overflow-hidden bg-slate-100 flex items-center justify-center group">
-                <img src={images[currentImgIndex]} alt="Invitation Event Card" className="w-full h-full object-cover" />
+              <div 
+                className="relative w-full min-h-[280px] max-h-[520px] overflow-hidden bg-slate-950 flex items-center justify-center group p-2 cursor-pointer"
+                onClick={() => setFullscreenImg(images[currentImgIndex])}
+                title="Click to view full screen image"
+              >
+                {/* Background blur fill */}
+                <img 
+                  src={images[currentImgIndex]} 
+                  alt="" 
+                  className="absolute inset-0 w-full h-full object-cover blur-xl opacity-40 scale-110 pointer-events-none" 
+                />
+                
+                {/* Main full image uncropped */}
+                <img 
+                  src={images[currentImgIndex]} 
+                  alt="Invitation Event Card" 
+                  className="relative z-10 max-w-full max-h-[500px] w-auto h-auto object-contain drop-shadow-lg rounded-lg transition-transform duration-300 group-hover:scale-[1.01]" 
+                />
                 
                 {images.length > 1 && (
                   <>
                     <button 
                       onClick={(e) => { e.stopPropagation(); setCurrentImgIndex(prev => (prev - 1 + images.length) % images.length); }} 
-                      className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/45 text-white flex items-center justify-center hover:bg-black/60 transition-colors text-lg"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/75 transition-colors text-xl shadow-md"
                     >
                       ‹
                     </button>
                     <button 
                       onClick={(e) => { e.stopPropagation(); setCurrentImgIndex(prev => (prev + 1) % images.length); }} 
-                      className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/45 text-white flex items-center justify-center hover:bg-black/60 transition-colors text-lg"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/75 transition-colors text-xl shadow-md"
                     >
                       ›
                     </button>
-                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-1.5 bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/20">
                       {images.map((_, idx) => (
                         <div 
                           key={idx} 
@@ -1132,6 +1149,27 @@ export default function InvitationDetailPage() {
         }`}>
           <Check size={14} strokeWidth={3} className="shrink-0" />
           <span>{toast.message}</span>
+        </div>
+      )}
+
+      {/* Lightbox Modal */}
+      {fullscreenImg && (
+        <div 
+          onClick={() => setFullscreenImg(null)}
+          className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-zoom-out animate-fade-in"
+        >
+          <button
+            onClick={() => setFullscreenImg(null)}
+            className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+          >
+            <X size={20} />
+          </button>
+          <img
+            src={fullscreenImg}
+            alt="Full Invitation Card"
+            className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
         </div>
       )}
     </div>
